@@ -18,13 +18,13 @@
 
             setInterval(() => {
                 ws.send("ping");
-                send_count_element.innerHtml = send_count++;
+                send_count_element.innerText = send_count++;
             }, 100)
         };
 
         ws.onmessage = (event) => {
             console.log(`[message] Message received from server: ${event.data}`);
-            receive_count_element.innerHtml = receive_count++;
+            receive_count_element.innerText = receive_count++;
         };
 
         ws.onclose = (event) => {

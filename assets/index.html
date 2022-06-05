@@ -14,7 +14,7 @@
 
             setInterval(() => {
                 ws.send("ping");
-            }, 1000)
+            }, 100)
         };
 
         ws.onmessage = (event) => {

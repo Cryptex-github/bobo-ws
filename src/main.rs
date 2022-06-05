@@ -53,7 +53,7 @@ async fn main() {
 
     let router = Router::new()
         .route("/", get(async || {
-            let content = tokio::fs::read("../assets/index.html").await.unwrap();
+            let content = tokio::fs::read("assets/index.html").await.unwrap();
             String::from_utf8(content).unwrap()
         }))
         .route("/ws", get(ws_handler))

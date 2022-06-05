@@ -7,18 +7,24 @@
     <title>Bobo WebSocket</title>
 
     <script>
+        let send_count = 1;
+        let receive_count = 1;
         let ws = new WebSocket('wss://' + window.location.host + '/ws');
+        const send_count_element = document.getElementById('send_count');
+        const receive_count_element = document.getElementById('receive_count');
 
         ws.onopen = (_) => {
             console.log('Connected to server');
 
             setInterval(() => {
                 ws.send("ping");
+                send_count_element.innerHtml = send_count++;
             }, 100)
         };
 
         ws.onmessage = (event) => {
             console.log(`[message] Message received from server: ${event.data}`);
+            receive_count_element.innerHtml = receive_count++;
         };
 
         ws.onclose = (event) => {
@@ -31,6 +37,7 @@
     </script>
 </head>
 <body>
-    Hello, world!
+    <p>Send Count: <span id="send_count">0</span></p>
+    <p>Receive Count: <span id="receive_count">0</span></p>
 </body>
 </html>

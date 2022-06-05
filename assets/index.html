@@ -13,13 +13,26 @@
         const send_count_element = document.getElementById('send_count');
         const receive_count_element = document.getElementById('receive_count');
 
+        function random_bytes(length) {
+            const crypto = (self.crypto || self.msCrypto)
+            const QUOTA = 65536;
+
+            const arr = new Uint8Array(length);
+
+            for (let i = 0; i < length; i += QUOTA) {
+                crypto.getRandomValues(arr.subarray(i, i + Math.min(length - i, QUOTA)));
+            }
+
+            return arr;
+        }
+
         ws.onopen = (_) => {
             console.log('Connected to server');
 
             setInterval(() => {
-                ws.send("ping");
+                ws.send(`UID: ${random_bytes(10000)}`);
                 send_count_element.innerText = send_count++;
-            }, 100)
+            }, 500)
         };
 
         ws.onmessage = (event) => {

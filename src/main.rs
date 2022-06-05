@@ -2,6 +2,8 @@
 
 use std::net::SocketAddr;
 use futures::{sink::SinkExt, stream::StreamExt};
+use tower_http::trace::TraceLayer;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use axum::{routing::get, extract::ws::{WebSocket, WebSocketUpgrade, Message}, Router, response::IntoResponse};
 
 
@@ -42,12 +44,20 @@ async fn handle_ws(socket: WebSocket) {
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(tracing_subscriber::EnvFilter::new(
+            std::env::var("RUST_LOG").unwrap_or_else(|_| "tower_http=info".into()),
+        ))
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
     let router = Router::new()
         .route("/", get(async || {
             let content = tokio::fs::read("../assets/index.html").await.unwrap();
             String::from_utf8(content).unwrap()
         }))
-        .route("/ws", get(ws_handler));
+        .route("/ws", get(ws_handler))
+        .layer(TraceLayer::new_for_http());
     
     let addr = SocketAddr::from(([0, 0, 0, 0], 8030));
 

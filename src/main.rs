@@ -25,19 +25,21 @@ async fn handle_ws(socket: WebSocket) {
         }
     });
 
-    if let Some(Ok(msg)) = receiver.next().await {
-        match msg {
-            Message::Text(m) => {
-                if tx.send(Message::Text(m)).is_err() {
-                    return;
-                }
-            },
-            Message::Binary(m) => {
-                if tx.send(Message::Binary(m)).is_err() {
-                    return;
-                }
-            },
-            _ => (),
+    loop {
+        if let Some(Ok(msg)) = receiver.next().await {
+            match msg {
+                Message::Text(m) => {
+                    if tx.send(Message::Text(m)).is_err() {
+                        return;
+                    }
+                },
+                Message::Binary(m) => {
+                    if tx.send(Message::Binary(m)).is_err() {
+                        return;
+                    }
+                },
+                _ => (),
+            }
         }
     }
 }

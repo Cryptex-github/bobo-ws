@@ -4,7 +4,7 @@ use std::net::SocketAddr;
 use futures::{sink::SinkExt, stream::StreamExt};
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use axum::{routing::get, extract::ws::{WebSocket, WebSocketUpgrade, Message}, Router, response::IntoResponse};
+use axum::{routing::get, extract::ws::{WebSocket, WebSocketUpgrade, Message}, Router, response::{IntoResponse, Html}};
 
 
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
@@ -53,8 +53,7 @@ async fn main() {
 
     let router = Router::new()
         .route("/", get(async || {
-            let content = tokio::fs::read("assets/index.html").await.unwrap();
-            String::from_utf8(content).unwrap()
+            Html(std::include_str!("../assets/index.html"))
         }))
         .route("/ws", get(ws_handler))
         .layer(TraceLayer::new_for_http());

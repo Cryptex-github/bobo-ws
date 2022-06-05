@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobo WebSocket</title>
+
+    <script>
+        let ws = new WebSocket('wss://' + window.location.host + '/ws');
+
+        ws.onopen = (_) => {
+            console.log('Connected to server');
+
+            setInterval(() => {
+                ws.send("ping");
+            }, 1000)
+        };
+
+        ws.onmessage = (event) => {
+            console.log(`[message] Message received from server: ${event.data}`);
+        };
+
+        ws.onclose = (event) => {
+            if (event.wasClean) {
+                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+            } else {
+                console.log('[close] Connection died');
+            }
+        };
+    </script>
+</head>
+<body>
+    Hello, world!
+</body>
+</html>

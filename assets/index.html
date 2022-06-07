@@ -29,7 +29,9 @@
             let ws = new WebSocket('wss://' + window.location.host + '/ws');
 
             ws.onopen = (_) => {
-                console.log('Connected to server');
+                if (window.LOG_EVENTS) {
+                    console.log('Connected to server');
+                }
 
                 setInterval(() => {
                     ws.send(`UID: ${random_bytes(10000)}`);
@@ -38,15 +40,19 @@
             };
 
             ws.onmessage = (event) => {
-                console.log(`[message] Message received from server: ${event.data}`);
+                if (window.LOG_EVENTS) {
+                    console.log(`[message] Message received from server: ${event.data}`);
+                }
                 receive_count_element.innerText = receive_count++;
             };
 
             ws.onclose = (event) => {
-                if (event.wasClean) {
-                    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-                } else {
-                    console.log('[close] Connection died');
+                if (window.LOG_EVENTS) {
+                    if (event.wasClean) {
+                        console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                    } else {
+                        console.log('[close] Connection died');
+                    }
                 }
 
                 setTimeout(() => {

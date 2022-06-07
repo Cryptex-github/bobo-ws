@@ -14,18 +14,25 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 async fn handle_ws(socket: WebSocket) {
     let (mut sender, mut receiver) = socket.split();
     let (tx, mut rx) = tokio::sync::mpsc::unbounded_channel::<Message>();
-
-    tokio::spawn(async move {
+    
+    let sender = tokio::spawn(async move {
         loop {
             if let Some(m) = rx.recv().await {
-                if sender.send(m).await.is_err() {
-                    return;
+                for tries in 1..10 {
+                    if sender.send(m.clone()).await.is_err() {
+                        if tries == 10 {
+                            return;
+                        }
+                        tokio::time::sleep(tokio::time::Duration::from_secs(tries * 2)).await;
+                        continue;
+                    }
+                    break;
                 }
             }
         }
     });
-
-    loop {
+    
+    while !sender.is_finished() {
         if let Some(Ok(msg)) = receiver.next().await {
             match msg {
                 Message::Text(m) => {

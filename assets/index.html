@@ -9,7 +9,6 @@
     <script>
         let send_count = 1;
         let receive_count = 1;
-        let ws = new WebSocket('wss://' + window.location.host + '/ws');
         const send_count_element = document.getElementById('send_count');
         const receive_count_element = document.getElementById('receive_count');
 
@@ -25,28 +24,38 @@
 
             return arr;
         }
+        
+        function start_ws() {
+            let ws = new WebSocket('wss://' + window.location.host + '/ws');
 
-        ws.onopen = (_) => {
-            console.log('Connected to server');
+            ws.onopen = (_) => {
+                console.log('Connected to server');
 
-            setInterval(() => {
-                ws.send(`UID: ${random_bytes(10000)}`);
-                send_count_element.innerText = send_count++;
-            }, 500)
-        };
+                setInterval(() => {
+                    ws.send(`UID: ${random_bytes(10000)}`);
+                    send_count_element.innerText = send_count++;
+                }, 500)
+            };
 
-        ws.onmessage = (event) => {
-            console.log(`[message] Message received from server: ${event.data}`);
-            receive_count_element.innerText = receive_count++;
-        };
+            ws.onmessage = (event) => {
+                console.log(`[message] Message received from server: ${event.data}`);
+                receive_count_element.innerText = receive_count++;
+            };
 
-        ws.onclose = (event) => {
-            if (event.wasClean) {
-                console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-            } else {
-                console.log('[close] Connection died');
-            }
-        };
+            ws.onclose = (event) => {
+                if (event.wasClean) {
+                    console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                } else {
+                    console.log('[close] Connection died');
+                }
+
+                setTimeout(() => {
+                    start_ws();
+                }, 5000);
+            };
+        }
+
+        start_ws();
     </script>
 </head>
 <body>
